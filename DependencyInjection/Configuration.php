@@ -18,7 +18,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('open_alumni_socle_cas');
+        $rootNode = $treeBuilder->root('gorg_cas');
         $rootNode
           ->children()
             ->scalarNode('user_class')

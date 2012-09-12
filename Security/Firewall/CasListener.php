@@ -66,7 +66,7 @@ class CasListener extends AbstractPreAuthenticatedListener
     protected function getPreAuthenticatedData(Request $request)
     {
  	/* Call CAS API to do authentication */
-        require_once(dirname(__FILE__) . '/../../lib/cas/CAS.php');
+        require_once(dirname(__FILE__) . '/../../../../../../vendor/CAS/CAS.php');
         \phpCAS::client($this->cas_protocol, $this->cas_server, $this->cas_port, $this->cas_path, false);
 	if($this->ca_cert)
 	{
