@@ -19,7 +19,7 @@
         "psr-0": { "Gorg\\Bundle\\CasBundle": "" }
     },
     "minimum-stability": "dev",
-    "target-dir": "Gorg/bundle/CasBundle",
+    "target-dir": "Gorg/Bundle/CasBundle",
     "extra": {
     }
 }
