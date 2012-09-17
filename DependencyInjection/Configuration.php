@@ -19,15 +19,6 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('gorg_cas');
-        $rootNode
-          ->children()
-            ->scalarNode('user_class')
-              ->end()
-            ->scalarNode('mapping_role_attribute')
-              ->end()
-            ->scalarNode('mapping_username_attribute')
-              ->end()
-          ->end();
 
         // Here you should define the parameters that are allowed to
         // configure your bundle. See the documentation linked above for

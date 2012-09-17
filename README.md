@@ -8,11 +8,26 @@ This file will help you to install and configure the project.
 2) Installation
 ---------------
 
-### a) Clone the repository to your symfony2 installation
+### a) Add the bundle to your composer.json file at the project root
 
-create and jump to the src/Gorg/Bundle/ directory and run the following commands:
-
-	git clone https://git.gadz.org/GorgCasBundle.git CasBundle
+    "require": {
+        ...
+        "gorg/casbundle": "master"
+    },
+    "repositories": {
+        "gorg": {
+            "type": "package",
+            "package": {
+                "name": "gorg/casbundle",
+                "version": "master",
+                "source": {
+                    "url": "ssh://git@gofannon.gorgu.net:7999/GRAM/gorgcasbundle.git",
+                    "type": "git",
+                    "reference": "master"
+                }
+            }
+        }
+    },
 
 ### b) Parameters Symfony sandbox for use GorgCasBundle
 
@@ -29,19 +44,15 @@ Please edit app/AppKernel.php file to update symfony Kernel
 
 Please edit app/config/config.yml and add the following line
 
-        open_alumni_socle_cas:
-            user_class: Gorg\Bundle\CasBundle\Entity\User
-            mapping_role_attribute: type
-            mapping_username_attribute: username
-
+    gorg_cas:
+        user_class: Gorg\Bundle\UserBundle\Entity\User
+        mapping_role_attribute: type
+        mapping_username_attribute: username
 
 ### c) Parameters Symfony sandbox for use Gorg CAS Authentication
 
 Please edit app/config/security.yml file to update symfony security policy
 
-	security:
-	    factories:
-	        - "%kernel.root_dir%/../src/Gorg/Bundle/CasBundle/Resources/config/security_factories.xml"
         # ...
         # If you want you can use a custom user provider
         # ...

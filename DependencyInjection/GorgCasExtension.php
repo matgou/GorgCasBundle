@@ -22,10 +22,6 @@ class GorgCasExtension extends Extension
 	$configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $container->setParameter('user_class', $config['user_class']);
-        $container->setParameter('mapping_role_attribute', $config['mapping_role_attribute']);
-        $container->setParameter('mapping_username_attribute', $config['mapping_username_attribute']);
-		
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
     }

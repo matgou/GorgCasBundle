@@ -6,10 +6,6 @@
 
    <parameters>
 	   <parameter key="auth_cas_listener_class">Gorg\Bundle\CasBundle\Security\Firewall\CasListener</parameter>
-           <parameter key="cas_user_provider_class">Gorg\Bundle\CasBundle\Security\User\CasUserProvider</parameter>
-           <parameter key="cas_user_class">%user_class%</parameter>
-           <parameter key="cas_mapping_role_attribute">%mapping_role_attribute%</parameter>
-           <parameter key="cas_mapping_username_attribute">%mapping_username_attribute%</parameter>
    </parameters>
 
    <services>
@@ -27,14 +23,6 @@
             <argument /> <!-- Cas User attribute-->
             <argument type="service" id="logger" on-invalid="null" />
             <argument type="service" id="event_dispatcher" on-invalid="null"/>
-       </service>
-       <service id="cas.user_provider" class="%cas_user_provider_class%">
-            <argument type="service" id="doctrine.orm.default_entity_manager"/>
-            <argument type="service" id="logger"/>
-            <argument type="service" id="security.encoder_factory"/>
-            <argument>%cas_user_class%</argument>
-            <argument>%cas_mapping_role_attribute%</argument>
-            <argument>%cas_mapping_username_attribute%</argument>
        </service>
    </services>
 </container>

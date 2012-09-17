@@ -1,0 +1,39 @@
+{
+    "name": "gorg/cas-bundle",
+    "type": "symfony-bundle",
+    "description": "Implements CAS Authentication on your website",
+    "keywords": ["cas", "authentication", "jasig", "gorg"],
+    "homepage": "http://opensource.gadz.org/x/FABO",
+    "license": "GPL",
+    "authors": [
+        {
+            "name": "Mathieu GOULIN",
+            "email": "mathieu.goulin@gadz.org"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2",
+        "jasig/phpcas": "master"
+    },
+    "repositories": {
+        "jasig-cas": {
+            "type": "package",
+            "package": {
+                "version": "master",
+                "name": "jasig/phpcas",
+                "source": {
+                    "url": "https://github.com/Jasig/phpCAS.git",
+                    "type": "git",
+                    "reference": "master"
+                }
+            }
+        }
+    },
+    "autoload": {
+        "psr-0": { "Gorg\\Bundle\\CasBundle": "" }
+    },
+    "minimum-stability": "dev",
+    "target-dir": "Gorg/bundle/CasBundle",
+    "extra": {
+    }
+}
