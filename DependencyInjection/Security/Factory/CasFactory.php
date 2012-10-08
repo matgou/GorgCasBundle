@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory;
 
 /**
  * Create the factory for build security listner and provider Cas Authentication
@@ -35,31 +35,8 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityF
  * @author   Mathieu GOULIN <mathieu.goulin@gadz.org>
  * @license  GNU General Public License
  */
-class CasFactory implements SecurityFactoryInterface
+class CasFactory extends AbstractFactory
 {
-    public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
-    {
-        
-        $provider = 'security.authentication.provider.pre_authenticated.'.$id;
-        $container
-            ->setDefinition($provider, new DefinitionDecorator('security.authentication.provider.pre_authenticated'))
-            ->replaceArgument(0, new Reference($userProvider))
-            ->addArgument($id)
-        ;
-
-        $listenerId = 'security.authentication.listener.cas.'.$id;
-        $listener = $container->setDefinition($listenerId, new DefinitionDecorator('cas.security.authentication.listener'))
-                    ->replaceArgument(2, $id)
-	            ->replaceArgument(3, $config['cas_server'])
-                    ->replaceArgument(4, $config['cas_port'])
-                    ->replaceArgument(5, $config['cas_path'])
-                    ->replaceArgument(6, $config['ca_cert_path'])
-                    ->replaceArgument(7, $config['cas_protocol'])
-                    ->replaceArgument(8, $config['cas_mapping_attribute']);
-
-        return array($provider, $listenerId, $defaultEntryPoint);
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -79,9 +56,29 @@ class CasFactory implements SecurityFactoryInterface
     /**
      * {@inheritdoc}
      */
+    protected function isRememberMeAware($config)
+    {  
+        return false;
+    }
+
+    public function __construct()
+    {  
+        $this->addOption('cas_server', '_cas_serveur');
+        $this->addOption('cas_port', 443);
+        $this->addOption('cas_path', '/cas/');
+        $this->addOption('ca_cert_path', '');
+        $this->addOption('cas_protocol', 'S1');
+        $this->addOption('cas_mapping_attribute', '###CAS_USER_NAME###');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function addConfiguration(NodeDefinition $node)
     {
-		/* Load the configuration */
+        parent::addConfiguration($node);
+
+	/* Load the configuration */
         $node
             ->children()
 		->scalarNode('cas_server')->end()
@@ -90,9 +87,44 @@ class CasFactory implements SecurityFactoryInterface
 		->scalarNode('ca_cert_path')->end()
 		->scalarNode('cas_protocol')->defaultValue('S1')->end() /* S1 for SAML_VERSION_1, 1.0 for CAS 1, 2.0 for CAS 2.0, See CAS.php for more information */
 		->scalarNode('cas_mapping_attribute')->defaultValue("###CAS_USER_NAME###")->end() /* default value reprensent the username returned by cas (not an attribute) */
+                ->scalarNode('check_path')->end()
 		->end()
 			;
+    }
+
+    protected function getListenerId()
+    {  
+        return 'cas.security.authentication.listener';
+    }
+
+    protected function createAuthProvider(ContainerBuilder $container, $id, $config, $userProviderId)
+    {  
+        $provider = 'security.authentication.provider.pre_authenticated.'.$id;
+        $container
+            ->setDefinition($provider, new DefinitionDecorator('security.authentication.provider.pre_authenticated'))
+            ->replaceArgument(0, new Reference($userProviderId))
+            ->addArgument($id)
         ;
-	}
+
+        return $provider;
+    }
+
+    protected function createListener($container, $id, $config, $userProvider)
+    {
+        $listenerId = parent::createListener($container, $id, $config, $userProvider);
+
+        return $listenerId;
+    }
+
+    protected function createEntryPoint($container, $id, $config, $defaultEntryPoint)
+    {  
+        $entryPointId = 'cas.security.authentication.listener.entry_point.'.$id;
+        $container
+            ->setDefinition($entryPointId, new DefinitionDecorator('security.authentication.retry_entry_point'))
+        ;
+
+        return $entryPointId;
+    }
+
 }
 /* vim:set et sw=4 sts=4 ts=4: */

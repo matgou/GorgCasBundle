@@ -20,13 +20,19 @@
  ***************************************************************************/
 namespace Gorg\Bundle\CasBundle\Security\Firewall;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
-use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
+use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
+use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Security\Http\Firewall\AbstractPreAuthenticatedListener;
+use Symfony\Component\Security\Http\Firewall\AbstractAuthenticationListener;
+use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 
 /**
  * Class for wait the authentication event and call the CAS Api to throw the authentication process
@@ -36,57 +42,50 @@ use Symfony\Component\Security\Http\Firewall\AbstractPreAuthenticatedListener;
  * @author   Mathieu GOULIN <mathieu.goulin@gadz.org>
  * @license  GNU General Public License
  */
-class CasListener extends AbstractPreAuthenticatedListener
+class CasListener extends AbstractAuthenticationListener
 {
-    private   $cas_server;
-    private   $cas_port;
-    private   $cas_path;
-    private   $ca_cert;
-    private   $cas_protocol;
-    private   $cas_mapping_attribute;
-	
     /**
-	 * Build a CasListener object
-	 * @param SecurityContextInterface $securityContext
-	 * @param Logger $logger the logger
-	 * @param AuthenticationManagerInterface $authenticationManager
+     * {@inheritdoc}
      */
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, $cas_server, $cas_port, $cas_path, $ca_cert, $cas_protocol, $cas_mapping_attribute, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
-        parent::__construct($securityContext, $authenticationManager, $providerKey, $logger, $dispatcher);
-
-        $this->cas_server            = $cas_server;
-        $this->cas_port              = $cas_port;
-        $this->cas_path              = $cas_path;
-        $this->ca_cert               = $ca_cert;
-        $this->cas_protocol          = $cas_protocol;
-        $this->cas_mapping_attribute = $cas_mapping_attribute;
+        parent::__construct($securityContext, $authenticationManager, $sessionStrategy, $httpUtils, $providerKey, $successHandler, $failureHandler, $options, $logger, $dispatcher);
     }
 
-    protected function getPreAuthenticatedData(Request $request)
+    /**
+     * {@inheritdoc}
+     */
+    protected function attemptAuthentication(Request $request)
     {
- 	/* Call CAS API to do authentication */
+        /* Call CAS API to do authentication */
         require_once(dirname(__FILE__) . '/../../../../../../phpcas/CAS.php');
-        \phpCAS::client($this->cas_protocol, $this->cas_server, $this->cas_port, $this->cas_path, false);
-	if($this->ca_cert)
-	{
-	        \phpCAS::setCasServerCACert($this->ca_cert);
+
+        \phpCAS::client($this->options['cas_protocol'], $this->options['cas_server'], $this->options['cas_port'], $this->options['cas_path'], false);
+
+        if($this->options['ca_cert_path'])
+        {
+            \phpCAS::setCasServerCACert($this->options['ca_cert_path']);
 	} else {
-		\phpCAS::setNoCasServerValidation();
+            \phpCAS::setNoCasServerValidation();
 	}
         \phpCAS::forceAuthentication();
-	if($this->cas_mapping_attribute) {
-	    $attributes = \phpCAS::getAttributes();
+        if($this->options['cas_mapping_attribute']) {
+            $attributes = \phpCAS::getAttributes();
 
-            if (!$attributes[$this->cas_mapping_attribute]) {
+            if (!$attributes[$this->options['cas_mapping_attribute']]) {
                 return;
             }
-	    return array($attributes[$this->cas_mapping_attribute], array('ROLE_USER'));
+            $user = $attributes[$this->options['cas_mapping_attribute']];
+            $credentials = array('ROLE_USER');
         } else {
-	    return array($attributes[\phpCAS::getUser()], array('ROLE_USER'));
-	}
-	return;
+            $user = $attributes[\phpCAS::getUser()];
+            $credentials = array('ROLE_USER');
+        }
+
+        if (null !== $this->logger) {
+            $this->logger->info(sprintf('Authentication success: %s', $user));
+        }
+
+        return $this->authenticationManager->authenticate(new PreAuthenticatedToken($user, $credentials, $this->providerKey));
     }
 }
-
-/* vim:set et sw=4 sts=4 ts=4: */

@@ -9,20 +9,10 @@
    </parameters>
 
    <services>
-       <service id="cas.security.authentication.listener"
-         class="%auth_cas_listener_class%" public="false">
-            <tag name="monolog.logger" channel="security" />
-            <argument type="service" id="security.context" />
-            <argument type="service" id="security.authentication.manager" />
-            <argument /> <!-- Provider-shared Key -->
-            <argument /> <!-- Cas Server -->
-            <argument /> <!-- Cas Server Port -->
-            <argument /> <!-- Cas Url Path -->
-            <argument /> <!-- Cas Cert-->
-            <argument /> <!-- Cas Protocol -->
-            <argument /> <!-- Cas User attribute-->
-            <argument type="service" id="logger" on-invalid="null" />
-            <argument type="service" id="event_dispatcher" on-invalid="null"/>
-       </service>
+        <service id="cas.security.authentication.listener"
+                 class="%auth_cas_listener_class%"
+                 parent="security.authentication.listener.abstract"
+                 abstract="true">
+        </service>
    </services>
 </container>
