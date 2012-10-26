@@ -120,7 +120,10 @@ class CasFactory extends AbstractFactory
     {  
         $entryPointId = 'cas.security.authentication.listener.entry_point.'.$id;
         $container
-            ->setDefinition($entryPointId, new DefinitionDecorator('security.authentication.retry_entry_point'))
+            ->setDefinition($entryPointId, new DefinitionDecorator('cas.security.authentication.cas_entry_point'))
+            ->addArgument(new Reference('security.http_utils'))
+            ->addArgument($config['check_path'])
+            ->addArgument(false)
         ;
 
         return $entryPointId;

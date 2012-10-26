@@ -6,6 +6,7 @@
 
    <parameters>
 	   <parameter key="auth_cas_listener_class">Gorg\Bundle\CasBundle\Security\Firewall\CasListener</parameter>
+           <parameter key="auth_cas_entry_point.class">Gorg\Bundle\CasBundle\Security\Http\EntryPoint\CasAuthenticationEntryPoint</parameter>
    </parameters>
 
    <services>
@@ -13,6 +14,10 @@
                  class="%auth_cas_listener_class%"
                  parent="security.authentication.listener.abstract"
                  abstract="true">
+        </service>
+
+        <service id="cas.security.authentication.cas_entry_point" class="%auth_cas_entry_point.class%" public="false" abstract="true">
+            <argument type="service" id="http_kernel" />
         </service>
    </services>
 </container>
