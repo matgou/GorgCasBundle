@@ -7,6 +7,7 @@
    <parameters>
 	   <parameter key="auth_cas_listener_class">Gorg\Bundle\CasBundle\Security\Firewall\CasListener</parameter>
            <parameter key="auth_cas_entry_point.class">Gorg\Bundle\CasBundle\Security\Http\EntryPoint\CasAuthenticationEntryPoint</parameter>
+           <parameter key="auth_cas_logout_handler.class">Gorg\Bundle\CasBundle\Security\Handler\LogoutSuccessHandler</parameter>
    </parameters>
 
    <services>
@@ -14,6 +15,9 @@
                  class="%auth_cas_listener_class%"
                  parent="security.authentication.listener.abstract"
                  abstract="true">
+        </service>
+
+        <service id="cas.security.handler.logout" class="%auth_cas_logout_handler.class%">
         </service>
 
         <service id="cas.security.authentication.cas_entry_point" class="%auth_cas_entry_point.class%" public="false" abstract="true">

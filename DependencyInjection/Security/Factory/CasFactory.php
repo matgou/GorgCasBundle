@@ -29,7 +29,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractF
 
 /**
  * Create the factory for build security listner and provider Cas Authentication
- 
+ * 
  * @category Authentication
  * @package  GorgCasBundle
  * @author   Mathieu GOULIN <mathieu.goulin@gadz.org>
@@ -59,6 +59,16 @@ class CasFactory extends AbstractFactory
     protected function isRememberMeAware($config)
     {  
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function create(ContainerBuilder $container, $id, $config, $userProviderId, $defaultEntryPointId)
+    {
+        $this->createLogoutSuccessHandler($container, $config);
+
+        return parent::create($container, $id, $config, $userProviderId, $defaultEntryPointId);
     }
 
     public function __construct()
@@ -129,5 +139,17 @@ class CasFactory extends AbstractFactory
         return $entryPointId;
     }
 
+    
+    protected function createLogoutSuccessHandler(ContainerBuilder $container, $config)
+    {
+        $templateHandler = 'cas.security.handler.logout';
+        $realHandler     = 'security.logout.success_handler';
+
+        // dont know if this is the right way, but it works
+        $container
+            ->setDefinition($realHandler, new DefinitionDecorator($templateHandler))
+            ->addArgument($config)
+        ;
+    }
 }
 /* vim:set et sw=4 sts=4 ts=4: */
