@@ -13,7 +13,7 @@
     ],
     "require": {
         "php": ">=5.3.2",
-        "gorg/phpcas": "master"
+        "gorg/phpcas": "dev-master"
     },
     "autoload": {
         "psr-0": { "Gorg\\Bundle\\CasBundle": "" }
