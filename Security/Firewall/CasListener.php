@@ -69,9 +69,9 @@ class CasListener extends AbstractAuthenticationListener
             \phpCAS::setNoCasServerValidation();
 	}
         \phpCAS::forceAuthentication();
-        if($this->options['cas_mapping_attribute']) {
-            $attributes = \phpCAS::getAttributes();
+        $attributes = \phpCAS::getAttributes();
 
+        if($this->options['cas_mapping_attribute']) {
             if (!$attributes[$this->options['cas_mapping_attribute']]) {
                 return;
             }
@@ -86,6 +86,9 @@ class CasListener extends AbstractAuthenticationListener
             $this->logger->info(sprintf('Authentication success: %s', $user));
         }
 
-        return $this->authenticationManager->authenticate(new PreAuthenticatedToken($user, $credentials, $this->providerKey));
+        $newToken = new PreAuthenticatedToken($user, $credentials, %this->providerKey);
+        $newToken->setAttributes($attributes);
+
+        return $this->authenticationManager->authenticate($newToken);
     }
 }

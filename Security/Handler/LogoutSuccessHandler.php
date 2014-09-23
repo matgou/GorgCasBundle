@@ -37,7 +37,7 @@ class LogoutSuccessHandler implements LogoutSuccessHandlerInterface
 
         \phpCAS::client($this->options['cas_protocol'], $this->options['cas_server'], $this->options['cas_port'], $this->options['cas_path'], false);   
 
-        \phpCAS::logout();
+        \phpCAS::logoutWithRedirectService($request->getScheme().'://'.$request->getHttpHost());
         return null;
     }
 }
