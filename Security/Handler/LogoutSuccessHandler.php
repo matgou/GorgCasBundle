@@ -33,9 +33,7 @@ class LogoutSuccessHandler implements LogoutSuccessHandlerInterface
     public function onLogoutSuccess(Request $request)
     {
         /* Call CAS API to do authentication */
-        require_once(dirname(__FILE__) . '/../../../../../../phpcas/CAS.php');
-
-        \phpCAS::client($this->options['cas_protocol'], $this->options['cas_server'], $this->options['cas_port'], $this->options['cas_path'], false);   
+        \phpCAS::client($this->options['cas_protocol'], $this->options['cas_server'], $this->options['cas_port'], $this->options['cas_path'], false);
 
         \phpCAS::logout();
         return null;
