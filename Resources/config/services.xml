@@ -18,6 +18,8 @@
         </service>
 
         <service id="cas.security.handler.logout" class="%auth_cas_logout_handler.class%">
+            <argument type="collection" />
+            <argument type="service" id="router" />
         </service>
 
         <service id="cas.security.authentication.cas_entry_point" class="%auth_cas_entry_point.class%" public="false" abstract="true">

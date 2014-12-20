@@ -74,4 +74,5 @@ Please edit app/config/security.yml file to update symfony security policy
                         ca_cert_path: ~
                         cas_protocol: S1
                         cas_mapping_attribute: username
+                        cas_logout: /logout
 

@@ -79,6 +79,7 @@ class CasFactory extends AbstractFactory
         $this->addOption('ca_cert_path', '');
         $this->addOption('cas_protocol', 'S1');
         $this->addOption('cas_mapping_attribute', '###CAS_USER_NAME###');
+        $this->addOption('cas_logout', '');
     }
 
     /**
@@ -91,15 +92,16 @@ class CasFactory extends AbstractFactory
 	/* Load the configuration */
         $node
             ->children()
-		->scalarNode('cas_server')->end()
-		->variableNode('cas_port')->end()
-		->scalarNode('cas_path')->end()
-		->scalarNode('ca_cert_path')->end()
-		->scalarNode('cas_protocol')->defaultValue('S1')->end() /* S1 for SAML_VERSION_1, 1.0 for CAS 1, 2.0 for CAS 2.0, See CAS.php for more information */
-		->scalarNode('cas_mapping_attribute')->defaultValue("###CAS_USER_NAME###")->end() /* default value reprensent the username returned by cas (not an attribute) */
+                ->scalarNode('cas_server')->end()
+                ->variableNode('cas_port')->end()
+                ->scalarNode('cas_path')->end()
+                ->scalarNode('ca_cert_path')->end()
+                ->scalarNode('cas_protocol')->defaultValue('S1')->end() /* S1 for SAML_VERSION_1, 1.0 for CAS 1, 2.0 for CAS 2.0, See CAS.php for more information */
+                ->scalarNode('cas_mapping_attribute')->defaultValue("###CAS_USER_NAME###")->end() /* default value reprensent the username returned by cas (not an attribute) */
                 ->scalarNode('check_path')->end()
-		->end()
-			;
+                ->scalarNode('cas_logout')->end()
+		    ->end()
+        ;
     }
 
     protected function getListenerId()
@@ -148,7 +150,7 @@ class CasFactory extends AbstractFactory
         // dont know if this is the right way, but it works
         $container
             ->setDefinition($realHandler, new DefinitionDecorator($templateHandler))
-            ->addArgument($config)
+            ->replaceArgument(0, $config)
         ;
     }
 }
