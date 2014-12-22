@@ -58,8 +58,6 @@ class CasListener extends AbstractAuthenticationListener
     protected function attemptAuthentication(Request $request)
     {
         /* Call CAS API to do authentication */
-        require_once(dirname(__FILE__) . '/../../../../../../phpcas/CAS.php');
-
         \phpCAS::client($this->options['cas_protocol'], $this->options['cas_server'], $this->options['cas_port'], $this->options['cas_path'], false);
 
         if($this->options['ca_cert_path'])
